@@ -15,16 +15,18 @@ import javafx.stage.Stage;
 
 public class Main extends Application {
 
-    private static final int ROWS = 3;
-    private static final int COLS = 4;
-    private static final int GRID_HEIGHT = 3;
-    private static final int GRID_WIDTH = 4;
-
     @Override
     public void start(Stage primaryStage) throws Exception{
 
+        int pairsAmount = 4;
+        int rows,cols,gridHeight,gridWidth;
+        rows = pairsAmount / 2;
+        cols = pairsAmount - 2;
+        gridHeight = rows;
+        gridWidth = cols;
+
         Game game = new Game();
-        game.generateCards(6);
+        game.generateCards(pairsAmount);
         game.buildDeck();
         game.shufflePairs();
         System.out.println(game.getCards());
@@ -32,15 +34,15 @@ public class Main extends Application {
 
         GridPane root = new GridPane();
         root.setPadding(new Insets(10,10,10,10));
-        root.setHgap(COLS*2);
-        root.setVgap(ROWS*2);
+        root.setHgap(cols*2);
+        root.setVgap(rows*2);
 
         int colorLooper = 0;
         int colorLooperInsider = 0;
 
-        for(int rowCount = 0; rowCount < ROWS; rowCount++) {
-            for(int colCount = 0; colCount < COLS; colCount++) {
-                if(colorLooper == 6) {
+        for(int rowCount = 0; rowCount < rows; rowCount++) {
+            for(int colCount = 0; colCount < cols; colCount++) {
+                if(colorLooper == pairsAmount) {
                     colorLooper = 0;
                 }
                 Rectangle rec = new Rectangle();
