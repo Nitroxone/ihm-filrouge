@@ -1,6 +1,7 @@
 package core;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class Game {
     private ArrayList<Pair> pairs = new ArrayList<>();
@@ -25,5 +26,9 @@ public class Game {
             cards.add(new Card());
 
         }
+    }
+
+    public void shufflePairs() {
+        Collections.shuffle(this.pairs);
     }
 }
