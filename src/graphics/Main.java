@@ -21,7 +21,7 @@ public class Main extends Application {
         int pairsAmount = 4;
         int rows,cols,gridHeight,gridWidth;
         rows = pairsAmount / 2;
-        cols = pairsAmount - 2;
+        cols = 4;
         gridHeight = rows;
         gridWidth = cols;
 
@@ -44,6 +44,7 @@ public class Main extends Application {
             for(int colCount = 0; colCount < cols; colCount++) {
                 if(colorLooper == pairsAmount) {
                     colorLooper = 0;
+                    game.shufflePairs();
                 }
                 Rectangle rec = new Rectangle();
                 rec.setWidth(140);
