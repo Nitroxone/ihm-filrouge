@@ -7,6 +7,8 @@ public class Card {
     private static int allColorsUsed = 0;
 
     private Color color;
+    private int rowPos = -1;
+    private int colPos = -1;
 
     public Color getColor() {
         return color;
@@ -15,6 +17,23 @@ public class Card {
     public Card() {
         this.color = allColors[allColorsUsed];
         allColorsUsed++;
+    }
+
+    public Card(Color color) {
+        this.color = color;
+    }
+
+    public void setPos(int row, int col) {
+        this.rowPos = row;
+        this.colPos = col;
+    }
+
+    public String printPos() {
+        if(rowPos == -1 && colPos == -1) {
+            return "EMPTY";
+        } else {
+            return "ROW=" + rowPos + ",COL=" + colPos;
+        }
     }
 
     @Override

@@ -1,11 +1,14 @@
 package graphics;
 
+import core.Card;
 import core.Game;
+import core.Pair;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
@@ -18,7 +21,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception{
 
-        int pairsAmount = 4;
+        int pairsAmount = 4; // EVEN NUMBERS ONLY !
         int rows,cols,gridHeight,gridWidth;
         rows = pairsAmount / 2;
         cols = 4;
@@ -32,10 +35,11 @@ public class Main extends Application {
         System.out.println(game.getCards());
         System.out.println(game.getPairs());
 
-        GridPane root = new GridPane();
-        root.setPadding(new Insets(10,10,10,10));
-        root.setHgap(cols*2);
-        root.setVgap(rows*2);
+        BorderPane root = new BorderPane();
+        GridPane branch = new GridPane();
+        branch.setPadding(new Insets(10,10,10,10));
+        branch.setHgap(cols*2);
+        branch.setVgap(rows*2);
 
         int colorLooper = 0;
         int colorLooperInsider = 0;
@@ -47,13 +51,22 @@ public class Main extends Application {
                     game.shufflePairs();
                 }
                 Rectangle rec = new Rectangle();
-                rec.setWidth(140);
-                rec.setHeight(200);
-                //rec.setFill(Color.AQUA);
+                rec.setWidth(120);
+                rec.setHeight(180);
                 rec.setFill(game.getPairs().get(colorLooper).getContent()[0].getColor());
                 GridPane.setRowIndex(rec,rowCount);
                 GridPane.setColumnIndex(rec,colCount);
-                root.getChildren().addAll(rec);
+                // ASSIGNATION DES COORDONNÉES À CHAQUE CARTES
+                if(game.getPairs().get(colorLooper).getContent()[0].printPos().equals("EMPTY")) {
+                    System.out.println("Aucune position sauvegardée pour la carte 1. Assignation.");
+                    game.getPairs().get(colorLooper).getContent()[0].setPos(rowCount, colCount);
+                    System.out.println(game.getPairs().get(colorLooper).getContent()[0].printPos());
+                } else {
+                    System.out.println("Position sauvegardée pour la carte 1. Assignation pour la carte 2.");
+                    game.getPairs().get(colorLooper).getContent()[1].setPos(rowCount, colCount);
+                    System.out.println(game.getPairs().get(colorLooper).getContent()[1].printPos());
+                }
+                branch.getChildren().addAll(rec);
                 colorLooper++;
                 if(colorLooperInsider == 1) {
                     colorLooperInsider = 0;
@@ -63,6 +76,17 @@ public class Main extends Application {
             }
         }
 
+        /*for(Pair pair : game.getPairs()) {
+            for(Card card : pair.getContent()) {
+                System.out.println(card.printPos());
+            }
+        }*/
+
+        System.out.println("Affichage de la position des deux cartes d'une même paire :");
+        System.out.println(game.getPairs().get(3).getContent()[0].printPos());
+        System.out.println(game.getPairs().get(3).getContent()[1].printPos());
+
+        root.setCenter(branch);
         Scene scene = new Scene(root);
 
         primaryStage.setTitle("Memory");
@@ -72,7 +96,6 @@ public class Main extends Application {
     }
 
     public static void main(String[] args) {
-
         launch(args);
     }
 }

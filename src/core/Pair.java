@@ -11,6 +11,8 @@ public class Pair {
 
     public Pair(Card card) {
         Arrays.fill(content,card);
+        content[0] = new Card(card.getColor());
+        content[1] = new Card(card.getColor());
     }
 
     @Override
