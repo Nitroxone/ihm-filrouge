@@ -9,9 +9,17 @@ public class Card {
     private Color color;
     private int rowPos = -1;
     private int colPos = -1;
+    private boolean hidden = true;
+    private boolean found = false;
 
     public Color getColor() {
         return color;
+    }
+    public boolean isHidden() {
+        return hidden;
+    }
+    public boolean isFound() {
+        return found;
     }
 
     public Card() {
@@ -34,6 +42,18 @@ public class Card {
         } else {
             return "ROW=" + rowPos + ",COL=" + colPos;
         }
+    }
+
+    public void reveal() {
+        this.hidden = false;
+    }
+
+    public void hide() {
+        this.hidden = true;
+    }
+
+    public void find() {
+        this.found = true;
     }
 
     @Override
