@@ -22,7 +22,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception{
 
-        int pairsAmount = 8; // EVEN NUMBERS ONLY !
+        int pairsAmount = 6; // EVEN NUMBERS ONLY !
         int rows,cols,gridHeight,gridWidth;
         rows = pairsAmount / 2;
         cols = 4;
@@ -42,8 +42,21 @@ public class Main extends Application {
         branch.setHgap(cols*2);
         branch.setVgap(rows*2);
 
-        int colorLooper = 0;
+        fillNewGrid(pairsAmount, rows, cols, game, branch);
 
+        printAllCardsPos(game);
+
+        root.setCenter(branch);
+        Scene scene = new Scene(root);
+
+        primaryStage.setTitle("Memory");
+        primaryStage.setScene(scene);
+        primaryStage.setResizable(false);
+        primaryStage.show();
+    }
+
+    private void fillNewGrid(int pairsAmount, int rows, int cols, Game game, GridPane branch) {
+        int colorLooper = 0;
         for(int rowCount = 0; rowCount < rows; rowCount++) {
             for(int colCount = 0; colCount < cols; colCount++) {
                 if(colorLooper == pairsAmount) {
@@ -60,32 +73,26 @@ public class Main extends Application {
                 if(game.getPairs().get(colorLooper).getContent()[0].printPos().equals("EMPTY")) {
                     System.out.println("Aucune position sauvegardée pour la carte 1. Assignation.");
                     game.getPairs().get(colorLooper).getContent()[0].setPos(rowCount, colCount);
-                    rec.addEventFilter(MouseEvent.MOUSE_PRESSED, new CardFilter(rec, game.getPairs().get(colorLooper).getContent()[0],game));
+                    rec.addEventFilter(MouseEvent.MOUSE_PRESSED, new CardFilter(rec, game.getPairs().get(colorLooper).getContent()[0], game));
                     System.out.println(game.getPairs().get(colorLooper).getContent()[0].printPos());
                 } else {
                     System.out.println("Position sauvegardée pour la carte 1. Assignation pour la carte 2.");
                     game.getPairs().get(colorLooper).getContent()[1].setPos(rowCount, colCount);
-                    rec.addEventFilter(MouseEvent.MOUSE_PRESSED, new CardFilter(rec, game.getPairs().get(colorLooper).getContent()[1],game));
+                    rec.addEventFilter(MouseEvent.MOUSE_PRESSED, new CardFilter(rec, game.getPairs().get(colorLooper).getContent()[1], game));
                     System.out.println(game.getPairs().get(colorLooper).getContent()[1].printPos());
                 }
                 branch.getChildren().addAll(rec);
                 colorLooper++;
             }
         }
+    }
 
+    private void printAllCardsPos(Game game) {
         for(Pair pair : game.getPairs()) {
             for(Card card : pair.getContent()) {
                 System.out.println(card.printPos());
             }
         }
-
-        root.setCenter(branch);
-        Scene scene = new Scene(root);
-
-        primaryStage.setTitle("Memory");
-        primaryStage.setScene(scene);
-        primaryStage.setResizable(false);
-        primaryStage.show();
     }
 
     public static boolean isGameOver(Game game) {
@@ -143,8 +150,6 @@ public class Main extends Application {
         }
 
         private void findPair() {
-            //matchRecs[0].setStyle("-fx-fill:white;");
-            //matchRecs[1].setStyle("-fx-fill:white;");
             matchCards[0].find();
             matchCards[1].find();
         }
