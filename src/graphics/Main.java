@@ -10,10 +10,12 @@ import javafx.scene.Scene;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
 import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
 
 public class Main extends Application {
 
@@ -51,19 +53,19 @@ public class Main extends Application {
                 Rectangle rec = new Rectangle();
                 rec.setWidth(120);
                 rec.setHeight(180);
-                rec.setFill(game.getPairs().get(colorLooper).getContent()[0].getColor());
+                rec.setFill(Color.BLACK);
                 GridPane.setRowIndex(rec,rowCount);
                 GridPane.setColumnIndex(rec,colCount);
                 // ASSIGNATION DES COORDONNÉES À CHAQUE CARTE
                 if(game.getPairs().get(colorLooper).getContent()[0].printPos().equals("EMPTY")) {
                     System.out.println("Aucune position sauvegardée pour la carte 1. Assignation.");
                     game.getPairs().get(colorLooper).getContent()[0].setPos(rowCount, colCount);
-                    rec.addEventFilter(MouseEvent.MOUSE_PRESSED, new CardFilter(rec,game.getPairs().get(colorLooper).getContent()[0]));
+                    rec.addEventFilter(MouseEvent.MOUSE_PRESSED, new CardFilter(rec, game.getPairs().get(colorLooper).getContent()[0],game));
                     System.out.println(game.getPairs().get(colorLooper).getContent()[0].printPos());
                 } else {
                     System.out.println("Position sauvegardée pour la carte 1. Assignation pour la carte 2.");
                     game.getPairs().get(colorLooper).getContent()[1].setPos(rowCount, colCount);
-                    rec.addEventFilter(MouseEvent.MOUSE_PRESSED, new CardFilter(rec,game.getPairs().get(colorLooper).getContent()[1]));
+                    rec.addEventFilter(MouseEvent.MOUSE_PRESSED, new CardFilter(rec, game.getPairs().get(colorLooper).getContent()[1],game));
                     System.out.println(game.getPairs().get(colorLooper).getContent()[1].printPos());
                 }
                 branch.getChildren().addAll(rec);
@@ -86,36 +88,54 @@ public class Main extends Application {
         primaryStage.show();
     }
 
+    public static boolean isGameOver(Game game) {
+        for (Pair pair : game.getPairs()) {
+            for (Card card : pair.getContent()) {
+                if(!card.isFound()) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
     static class CardFilter implements EventHandler<MouseEvent> {
         Rectangle rec;
         Card card;
+        Game game;
         static Card[] matchCards = new Card[2];
         static Rectangle[] matchRecs = new Rectangle[2];
 
-        CardFilter(Rectangle rec, Card card) {
+        CardFilter(Rectangle rec, Card card, Game game) {
             this.rec = rec;
             this.card = card;
+            this.game = game;
             Arrays.fill(matchCards,null);
         }
 
         @Override
         public void handle(MouseEvent event) {
-            rec.setStyle("-fx-fill:black;");
-
             System.out.println("Card color : " + card.getColor());
             System.out.println("Card pos : " + card.printPos());
 
             if(!card.isFound()) {
+                rec.setFill(card.getColor());
+                System.out.println("REVEALED");
                 if (matchCards[0] == null) {
                     matchCards[0] = card;
                     matchRecs[0] = rec;
-                } else if (matchCards[1] == null) {
+                } else if (matchCards[1] == null && !(matchCards[0].equals(card))) {
                     matchCards[1] = card;
                     matchRecs[1] = rec;
                     if (isMatching()) {
                         findPair();
+                    } else {
+                        fillBlack();
                     }
                     clearMatchCards();
+                    if(isGameOver(game)) {
+                        System.out.println("Game is finished !");
+                    }
                 }
             }
 
@@ -123,8 +143,8 @@ public class Main extends Application {
         }
 
         private void findPair() {
-            matchRecs[0].setStyle("-fx-fill:white;");
-            matchRecs[1].setStyle("-fx-fill:white;");
+            //matchRecs[0].setStyle("-fx-fill:white;");
+            //matchRecs[1].setStyle("-fx-fill:white;");
             matchCards[0].find();
             matchCards[1].find();
         }
@@ -136,6 +156,11 @@ public class Main extends Application {
         public void clearMatchCards() {
             matchCards[0] = null;
             matchCards[1] = null;
+        }
+
+        private void fillBlack() {
+            matchRecs[0].setFill(Color.BLACK);
+            matchRecs[1].setFill(Color.BLACK);
         }
     }
 
