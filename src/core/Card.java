@@ -91,7 +91,7 @@ public class Card {
     }
 
     /**
-     * Resets the <b>allColorsUsed</b> attribute. That allows the system to generate a new set of cards from scratch.
+     * Resets the <b>allColorsUsed</b> attribute. That allows the system to generate a new set of cards from scratch, and prevent an <i>IndexOutOfBoundsException</i>.
      */
     public void resetColors() {
         allColorsUsed = 0;

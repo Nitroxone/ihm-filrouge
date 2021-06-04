@@ -33,17 +33,18 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
 
+        // DECLARING : NON-STATIC LABELS AND BUTTONS
         Label gameTitle = new Label("Memory Project");
         Button buttonNewGame = new Button("New game");
         Button buttonStopGame = new Button("Leave game");
-
+        Label statusTitle = new Label("Game status");
         Label scoreTitle = new Label("Score");
 
+        // STYLE-SETTING FOR STATIC LABELS
         scoreCounter.setStyle("-fx-font-size:40;");
         gameStatus.setStyle("-fx-font-size:20;");
 
-        Label statusTitle = new Label("Game status");
-
+        // DECLARING : PANES
         BorderPane root = new BorderPane();
         GridPane branch = new GridPane();
         BorderPane topBox = new BorderPane();
@@ -69,6 +70,7 @@ public class Main extends Application {
 
                 Optional<ButtonType> userChoice = newGameSetup.showAndWait();
 
+                // pairsAmount RECEIVES A VALUE FROM USER'S PICK
                 if(userChoice.get() == pickFourPairs) {
                     pairsAmount = 4;
                     generate = true;
@@ -80,19 +82,31 @@ public class Main extends Application {
                     generate = true;
                 }
 
+                // GENERATING A NEW GAME
                 if(generate) {
+                    // CREATING A NEW EMPTY CARD IN ORDER TO RESET THE COLORS (CHECK JAVADOC FOR MORE INFORMATION)
                     Card resetter = new Card(true);
+
+                    // RESETTING THE COLORS, THEN THE SCORE
                     resetter.resetColors();
                     resetScore();
+
+                    // CREATING A NEW GAME
                     game = new Game();
                     game.generateCards(pairsAmount);
                     game.buildDeck();
                     game.shufflePairs();
 
+                    // CALCULATING THE GridPane ROWCOUNT
                     rows = pairsAmount / 2;
 
+                    // REMOVING THE PREVIOUS CARDS FROM THE GridPane
                     branch.getChildren().clear();
+
+                    // GENERATING A NEW GRID ACCORDING TO THE SETTINGS ABOVE
                     fillNewGrid(pairsAmount, rows, COLS, game, branch);
+
+                    // CHANGING THE GAME STATUS
                     gameStatus.setText("Ongoing");
                 }
             }
@@ -100,6 +114,8 @@ public class Main extends Application {
         buttonStopGame.addEventFilter(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
+                // IF THERE IS AN ONGOING GAME, THEN LEAVE IT, AND RESET THE SCORE AS WELL AS THE GAME STATUS
+                // IF THERE IS NO ONGOING GAME, THEN EXIT THE PROGRAM
                 if(game != null) {
                     game = null;
                     branch.getChildren().clear();
@@ -112,6 +128,7 @@ public class Main extends Application {
             }
         });
 
+        // SETTING THE PANES
         root.setMinSize(400,150);
         branch.setPadding(new Insets(10));
         branch.setHgap(COLS *2);
@@ -146,11 +163,21 @@ public class Main extends Application {
         stageConfig(primaryStage, scene);
     }
 
+    /**
+     * Resets the current score, and the score display Label.
+     */
     private void resetScore() {
         scoreCounter.setText("0");
-        game.resetScore();
+        if(game != null) {
+            game.resetScore();
+        }
     }
 
+    /**
+     * Configures the stage with the declared parameters.
+     * @param primaryStage the stage to be configured
+     * @param scene the associated scene
+     */
     private void stageConfig(Stage primaryStage, Scene scene) {
         primaryStage.setTitle("Memory");
         primaryStage.setScene(scene);
@@ -159,34 +186,54 @@ public class Main extends Application {
         primaryStage.show();
     }
 
+    /**
+     * Generates a new grid of cards, by iterating via <i>for</i> loops over <b>rows</b> and <b>cols</b>.
+     *
+     * @param pairsAmount the amount of pairs generated
+     * @param rows the grid rows
+     * @param cols the grid columns
+     * @param game the game
+     * @param branch the pane the grid is drawn on
+     */
     private void fillNewGrid(int pairsAmount, int rows, int cols, Game game, GridPane branch) {
+        // THE colorLooper VARIABLE IS USED TO SAFELY ITERATE OVER EACH PAIR, ENSURING A RANDOM AND UNPREDICTABLE LAYOUT OF THE CARDS ON THE GRID.
         int colorLooper = 0;
         for(int rowCount = 0; rowCount < rows; rowCount++) {
             for(int colCount = 0; colCount < cols; colCount++) {
                 if(colorLooper == pairsAmount) {
+                    // ONCE THE FIRST SET OF CARDS (THE FIRST CARD FOR EACH PAIR) HAS BEEN GENERATED, RESET THE colorLooper AND SHUFFLE THE CARDS
                     colorLooper = 0;
                     game.shufflePairs();
                 }
+                // CREATING A NEW RECTANGLE AND SETTING ITS STYLE, THEN SETTING ITS POSITION ON THE GRID
                 Rectangle rec = new Rectangle();
                 setRectangleStyle(rec);
                 GridPane.setRowIndex(rec,rowCount);
                 GridPane.setColumnIndex(rec,colCount);
-                // ASSIGNATION DES COORDONNÉES À CHAQUE CARTE
-                if(game.getPairs().get(colorLooper).getContent()[0].printPos().equals("EMPTY")) {
-                    //Aucune position sauvegardée pour la carte 1. Assignation.
+
+                // ASSIGNING COORDINATES TO EACH CARD :
+                if("EMPTY".equals(game.getPairs().get(colorLooper).getContent()[0].printPos())) {
+                    //NO POSITION FOUND FOR CARD 1 OF THE PAIR. ASSIGNING NEW POSITION TO CARD 1
                     game.getPairs().get(colorLooper).getContent()[0].setPos(rowCount, colCount);
+                    // ADDING A NEW LISTENER TO THE CARD
                     rec.addEventFilter(MouseEvent.MOUSE_PRESSED, new CardFilter(rec, game.getPairs().get(colorLooper).getContent()[0], game));
                 } else {
-                    //Position sauvegardée pour la carte 1. Assignation pour la carte 2.
+                    //POSITION FOUND FOR CARD 1. ASSIGNING NEW POSITION TO CARD 2
                     game.getPairs().get(colorLooper).getContent()[1].setPos(rowCount, colCount);
+                    // ADDING A NEW LISTENER TO THE CARD
                     rec.addEventFilter(MouseEvent.MOUSE_PRESSED, new CardFilter(rec, game.getPairs().get(colorLooper).getContent()[1], game));
                 }
+                // ADDING THE RECTANGLE TO THE BRANCH
                 branch.getChildren().addAll(rec);
                 colorLooper++;
             }
         }
     }
 
+    /**
+     * Sets a rectangle to specific parameters.
+     * @param rec the rectangle to be set
+     */
     private void setRectangleStyle(Rectangle rec) {
         rec.setWidth(100);
         rec.setHeight(160);
@@ -194,6 +241,11 @@ public class Main extends Application {
         rec.setStyle("-fx-background-radius: 10 10 10 10");
     }
 
+    /**
+     * Checks if the game is over by looking to any non-found card on the grid.
+     * @param game the game to be checked
+     * @return <b>true</b> if the game is over, <b>false</b> otherwise
+     */
     public static boolean isGameOver(Game game) {
         for (Pair pair : game.getPairs()) {
             for (Card card : pair.getContent()) {
@@ -205,6 +257,10 @@ public class Main extends Application {
         return true;
     }
 
+    /**
+     * Updates the game score with the specified amount.
+     * @param amount the amount to be appended to the score
+     */
     public static void updateScore(int amount) {
         System.out.println("SCORE UPDATED WITH " + amount);
         game.appendScore(amount);
