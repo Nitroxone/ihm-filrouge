@@ -242,7 +242,7 @@ public class Main extends Application {
     }
 
     /**
-     * Checks if the game is over by looking to any non-found card on the grid.
+     * Checks if the game is over by looking for any non-found card on the grid.
      * @param game the game to be checked
      * @return <b>true</b> if the game is over, <b>false</b> otherwise
      */
@@ -259,10 +259,10 @@ public class Main extends Application {
 
     /**
      * Updates the game score with the specified amount.
+     * Checks if the score is a "perfect guess" : if the player found all the card pairs in a row.
      * @param amount the amount to be appended to the score
      */
     public static void updateScore(int amount) {
-        System.out.println("SCORE UPDATED WITH " + amount);
         game.appendScore(amount);
         scoreCounter.setText(String.valueOf(game.getScore()));
         if(game.getScore() == pairsAmount * 4) {
@@ -270,11 +270,15 @@ public class Main extends Application {
         }
     }
 
+    /**
+     * Customized EventHandler class for the cards.
+     */
     public static class CardFilter implements EventHandler<MouseEvent> {
         Rectangle rec;
         Card card;
         Game game;
         Timer timer = new Timer();
+        // THE matchCards ARRAY IS USED FOR COMPARING TWO SELECTED CARDS. THE matchRecs IS THE SAME.
         static Card[] matchCards = new Card[2];
         static Rectangle[] matchRecs = new Rectangle[2];
 
@@ -287,24 +291,32 @@ public class Main extends Application {
 
         @Override
         public void handle(MouseEvent event) {
+            // FIRST, CHECK IF THE CARD HAS ALREADY BEEN FOUND. IF IT HAS, NOTHING HAPPENS
             if(!card.isFound()) {
+                // REVEAL THE CARD (SHOW ITS COLOR)
                 rec.setFill(card.getColor());
+                // THE FOLLOWING PORTION OF CODE HAS A DELAY OF 0.5 SECONDS IN ORDER FOR THE PLAYER TO WITNESS WHICH CARD HAS BEEN REVEALED IF HE FALSELY GUESSES A PAIR, BEFORE THE DARK IS HIDDEN AGAIN
                 timer.schedule(new TimerTask() {
                     @Override
                     public void run() {
                         Platform.runLater(() -> {
+                            // IF NO CARD HAS BEEN SELECTED YET, ADD IT TO THE ARRAYS
                             if (matchCards[0] == null) {
                                 matchCards[0] = card;
                                 matchRecs[0] = rec;
+                            // IF ONLY ONE CARD IS ALREADY SELECTED AND THE CURRENT CARD IS DIFFERENT, THEN ADD IT TO THE ARRAYS
                             } else if (matchCards[1] == null && !(matchCards[0].equals(card))) {
                                 matchCards[1] = card;
                                 matchRecs[1] = rec;
+                                // IF THE TWO SELECTED CARDS MATCH, THEN PERMANENTLY REVEAL THEM. IF NOT, HIDE THEM BACK
                                 if (isMatching()) {
                                     findPair();
                                 } else {
                                     fillBlack();
                                 }
+                                // AFTER ANY COMPARISON, CLEAR THE ARRAYS IN ORDER TO START A NEW SELECTION
                                 clearMatchCards();
+                                // CHECK IF THE GAME IS OVER. IF IT IS, NOTIFY THE PLAYER
                                 if(isGameOver(game)) {
                                     gameOver();
                                 }
@@ -315,6 +327,9 @@ public class Main extends Application {
             }
         }
 
+        /**
+         * Notifies the player that the game is over and changes the <b>gameStatus</b> Label.
+         */
         private void gameOver() {
             gameStatus.setText("Finished!");
             Alert gameOverPopup = new Alert(Alert.AlertType.INFORMATION);
@@ -324,21 +339,35 @@ public class Main extends Application {
             gameOverPopup.showAndWait();
         }
 
+        /**
+         * Permanently reveals the two cards contained in the <b>matchCards</b> array, and adds 4 points to the score.
+         */
         private void findPair() {
             matchCards[0].find();
             matchCards[1].find();
             updateScore(4);
         }
 
+
+        /**
+         * Checks whether the colors of the two cards contained in <b>matchCards</b> do match.
+         * @return true if the colors of the two cards match, false otherwise
+         */
         public boolean isMatching() {
             return matchCards[0].getColor().equals(matchCards[1].getColor());
         }
 
+        /**
+         * Clears the <b>matchCards</b> array.
+         */
         public void clearMatchCards() {
             matchCards[0] = null;
             matchCards[1] = null;
         }
 
+        /**
+         * Reverts the revealed cards back to their black color, and removes 2 points from the score.
+         */
         private void fillBlack() {
             matchRecs[0].setFill(Color.BLACK);
             matchRecs[1].setFill(Color.BLACK);
