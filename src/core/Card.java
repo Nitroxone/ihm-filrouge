@@ -22,13 +22,11 @@ public class Card {
         return found;
     }
 
-    public Card() {
-        this.color = allColors[allColorsUsed];
-        allColorsUsed++;
-    }
-
     public Card(boolean uncolored) {
-
+        if(!uncolored) {
+            this.color = allColors[allColorsUsed];
+            allColorsUsed++;
+        }
     }
 
     public Card(Color color) {

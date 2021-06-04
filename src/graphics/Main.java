@@ -75,14 +75,20 @@ public class Main extends Application {
                     game.generateCards(pairsAmount);
                     game.buildDeck();
                     game.shufflePairs();
-                    /*System.out.println(game.getCards());
-                    System.out.println(game.getPairs());*/
 
                     rows = pairsAmount / 2;
 
                     branch.getChildren().clear();
                     fillNewGrid(pairsAmount, rows, cols, game, branch);
                 }
+            }
+        });
+
+        buttonStopGame.addEventFilter(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                game = null;
+                branch.getChildren().clear();
             }
         });
 
@@ -96,16 +102,13 @@ public class Main extends Application {
         branch.setAlignment(Pos.CENTER);
         topBox.getChildren().addAll(gameTitle,buttonNewGame, buttonStopGame);
 
-        //fillNewGrid(pairsAmount, rows, cols, game, branch);
-        //printAllCardsPos(game);
-
         root.setCenter(branch);
         root.setTop(topBox);
         Scene scene = new Scene(root,Double.MAX_VALUE,Double.MAX_VALUE);
 
         primaryStage.setTitle("Memory");
         primaryStage.setScene(scene);
-        //primaryStage.setResizable(false);
+        primaryStage.setResizable(false);
         primaryStage.setMaximized(true);
         primaryStage.show();
     }

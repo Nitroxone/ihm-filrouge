@@ -23,7 +23,7 @@ public class Game {
 
     public void generateCards(int amount) {
         for(int i = 0; i < amount; i++) {
-            cards.add(new Card());
+            cards.add(new Card(false));
         }
     }
 
