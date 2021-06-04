@@ -26,7 +26,7 @@ public class Main extends Application {
     private static Game game = null;
     private static int pairsAmount = 4;
     private int rows = 2;
-    private final int cols = 4;
+    private final int COLS = 4;
     private static Label scoreCounter = new Label("0");
     private static Label gameStatus = new Label("No game");
 
@@ -83,6 +83,7 @@ public class Main extends Application {
                 if(generate) {
                     Card resetter = new Card(true);
                     resetter.resetColors();
+                    resetScore();
                     game = new Game();
                     game.generateCards(pairsAmount);
                     game.buildDeck();
@@ -91,7 +92,7 @@ public class Main extends Application {
                     rows = pairsAmount / 2;
 
                     branch.getChildren().clear();
-                    fillNewGrid(pairsAmount, rows, cols, game, branch);
+                    fillNewGrid(pairsAmount, rows, COLS, game, branch);
                     gameStatus.setText("Ongoing");
                 }
             }
@@ -103,7 +104,7 @@ public class Main extends Application {
                     game = null;
                     branch.getChildren().clear();
                     gameStatus.setText("No game");
-                    scoreCounter.setText("0");
+                    resetScore();
                 } else {
                     primaryStage.close();
                     System.exit(0);
@@ -113,7 +114,7 @@ public class Main extends Application {
 
         root.setMinSize(400,150);
         branch.setPadding(new Insets(10));
-        branch.setHgap(cols*2);
+        branch.setHgap(COLS *2);
         branch.setVgap(rows*2);
         branch.setAlignment(Pos.CENTER);
 
@@ -144,7 +145,12 @@ public class Main extends Application {
 
         stageConfig(primaryStage, scene);
     }
-    
+
+    private void resetScore() {
+        scoreCounter.setText("0");
+        game.resetScore();
+    }
+
     private void stageConfig(Stage primaryStage, Scene scene) {
         primaryStage.setTitle("Memory");
         primaryStage.setScene(scene);
@@ -186,14 +192,6 @@ public class Main extends Application {
         rec.setHeight(160);
         rec.setFill(Color.BLACK);
         rec.setStyle("-fx-background-radius: 10 10 10 10");
-    }
-
-    private void printAllCardsPos(Game game) {
-        for(Pair pair : game.getPairs()) {
-            for(Card card : pair.getContent()) {
-                System.out.println(card.printPos());
-            }
-        }
     }
 
     public static boolean isGameOver(Game game) {

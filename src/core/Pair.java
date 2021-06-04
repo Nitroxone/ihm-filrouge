@@ -9,6 +9,10 @@ public class Pair {
         return content;
     }
 
+    /**
+     * Creates a new pair, which is an array of two similar cards.
+     * @param card the card that will be used to create the pair
+     */
     public Pair(Card card) {
         Arrays.fill(content,card);
         content[0] = new Card(card.getColor());
