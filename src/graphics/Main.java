@@ -11,7 +11,6 @@ import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -41,6 +40,7 @@ public class Main extends Application {
         Label scoreTitle = new Label("Score");
 
         scoreCounter.setStyle("-fx-font-size:40;");
+        gameStatus.setStyle("-fx-font-size:20;");
 
         Label statusTitle = new Label("Game status");
 
@@ -144,7 +144,7 @@ public class Main extends Application {
 
         stageConfig(primaryStage, scene);
     }
-
+    
     private void stageConfig(Stage primaryStage, Scene scene) {
         primaryStage.setTitle("Memory");
         primaryStage.setScene(scene);
