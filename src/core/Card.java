@@ -27,6 +27,10 @@ public class Card {
         allColorsUsed++;
     }
 
+    public Card(boolean uncolored) {
+
+    }
+
     public Card(Color color) {
         this.color = color;
     }
@@ -54,6 +58,10 @@ public class Card {
 
     public void find() {
         this.found = true;
+    }
+
+    public void resetColors() {
+        allColorsUsed = 0;
     }
 
     @Override
