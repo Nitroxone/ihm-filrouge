@@ -87,8 +87,13 @@ public class Main extends Application {
         buttonStopGame.addEventFilter(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                game = null;
-                branch.getChildren().clear();
+                if(game != null) {
+                    game = null;
+                    branch.getChildren().clear();
+                } else {
+                    primaryStage.close();
+                    System.exit(0);
+                }
             }
         });
 
