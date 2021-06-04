@@ -85,10 +85,10 @@ public class Main extends Application {
                 // GENERATING A NEW GAME
                 if(generate) {
                     // CREATING A NEW EMPTY CARD IN ORDER TO RESET THE COLORS (CHECK JAVADOC FOR MORE INFORMATION)
-                    Card resetter = new Card(true);
+                    Card emptyCard = new Card(true);
 
                     // RESETTING THE COLORS, THEN THE SCORE
-                    resetter.resetColors();
+                    emptyCard.resetColors();
                     resetScore();
 
                     // CREATING A NEW GAME
