@@ -6,12 +6,16 @@ import java.util.Collections;
 public class Game {
     private ArrayList<Pair> pairs = new ArrayList<>();
     private ArrayList<Card> cards = new ArrayList<>();
+    private int score = 0;
 
     public ArrayList<Pair> getPairs() {
         return pairs;
     }
     public ArrayList<Card> getCards() {
         return cards;
+    }
+    public int getScore() {
+        return score;
     }
 
     public void buildDeck() {
@@ -29,5 +33,9 @@ public class Game {
 
     public void shufflePairs() {
         Collections.shuffle(this.pairs);
+    }
+
+    public void resetScore() {
+        score = 0;
     }
 }

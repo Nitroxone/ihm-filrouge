@@ -26,18 +26,27 @@ public class Main extends Application {
     private Game game = null;
     private int pairsAmount = 4;
     private int rows = 2;
-    private int cols = 4;
+    private final int cols = 4;
 
     @Override
-    public void start(Stage primaryStage) throws Exception{
+    public void start(Stage primaryStage) throws Exception {
 
         Label gameTitle = new Label("Memory Project");
         Button buttonNewGame = new Button("New game");
         Button buttonStopGame = new Button("Leave game");
 
+        Label scoreTitle = new Label("Score");
+        Label scoreCounter = new Label("0");
+
+        Label statusTitle = new Label("Game status");
+        Label gameStatus = new Label("No game");
+
         BorderPane root = new BorderPane();
         GridPane branch = new GridPane();
-        VBox topBox = new VBox();
+        BorderPane topBox = new BorderPane();
+        VBox topLeftBox = new VBox();
+        VBox topRightBox = new VBox();
+        VBox topCenterBox = new VBox();
 
         buttonNewGame.addEventFilter(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
             @Override
@@ -80,16 +89,17 @@ public class Main extends Application {
 
                     branch.getChildren().clear();
                     fillNewGrid(pairsAmount, rows, cols, game, branch);
+                    gameStatus.setText("Ongoing");
                 }
             }
         });
-
         buttonStopGame.addEventFilter(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
                 if(game != null) {
                     game = null;
                     branch.getChildren().clear();
+                    gameStatus.setText("No game");
                 } else {
                     primaryStage.close();
                     System.exit(0);
@@ -99,18 +109,39 @@ public class Main extends Application {
 
         root.setMinSize(400,150);
         branch.setPadding(new Insets(10));
-        topBox.setPadding(new Insets(20));
         branch.setHgap(cols*2);
         branch.setVgap(rows*2);
-        topBox.setSpacing(10);
-        topBox.setAlignment(Pos.CENTER);
         branch.setAlignment(Pos.CENTER);
-        topBox.getChildren().addAll(gameTitle,buttonNewGame, buttonStopGame);
+
+        topLeftBox.setAlignment(Pos.TOP_LEFT);
+        topRightBox.setAlignment(Pos.TOP_RIGHT);
+        topBox.setRight(topRightBox);
+        topBox.setLeft(topLeftBox);
+        topBox.setCenter(topCenterBox);
+
+        topCenterBox.setSpacing(10);
+        topCenterBox.setAlignment(Pos.CENTER);
+        topCenterBox.setPadding(new Insets(20));
+        topCenterBox.getChildren().addAll(gameTitle,buttonNewGame, buttonStopGame);
+
+        topLeftBox.setSpacing(10);
+        topLeftBox.setAlignment(Pos.CENTER_LEFT);
+        topLeftBox.setPadding(new Insets(20));
+        topLeftBox.getChildren().addAll(scoreTitle,scoreCounter);
+
+        topRightBox.setSpacing(10);
+        topRightBox.setAlignment(Pos.CENTER_RIGHT);
+        topRightBox.setPadding(new Insets(20));
+        topRightBox.getChildren().addAll(statusTitle,gameStatus);
 
         root.setCenter(branch);
         root.setTop(topBox);
         Scene scene = new Scene(root,Double.MAX_VALUE,Double.MAX_VALUE);
 
+        stageConfig(primaryStage, scene);
+    }
+
+    private void stageConfig(Stage primaryStage, Scene scene) {
         primaryStage.setTitle("Memory");
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
@@ -127,9 +158,7 @@ public class Main extends Application {
                     game.shufflePairs();
                 }
                 Rectangle rec = new Rectangle();
-                rec.setWidth(100);
-                rec.setHeight(160);
-                rec.setFill(Color.BLACK);
+                setRectangleStyle(rec);
                 GridPane.setRowIndex(rec,rowCount);
                 GridPane.setColumnIndex(rec,colCount);
                 // ASSIGNATION DES COORDONNÉES À CHAQUE CARTE
@@ -146,6 +175,13 @@ public class Main extends Application {
                 colorLooper++;
             }
         }
+    }
+
+    private void setRectangleStyle(Rectangle rec) {
+        rec.setWidth(100);
+        rec.setHeight(160);
+        rec.setFill(Color.BLACK);
+        rec.setStyle("-fx-background-radius: 10 10 10 10");
     }
 
     private void printAllCardsPos(Game game) {
@@ -184,12 +220,8 @@ public class Main extends Application {
 
         @Override
         public void handle(MouseEvent event) {
-            System.out.println("Card color : " + card.getColor());
-            System.out.println("Card pos : " + card.printPos());
-
             if(!card.isFound()) {
                 rec.setFill(card.getColor());
-                System.out.println("REVEALED");
                 timer.schedule(new TimerTask() {
                     @Override
                     public void run() {
@@ -207,13 +239,15 @@ public class Main extends Application {
                             clearMatchCards();
                             if(isGameOver(game)) {
                                 System.out.println("Game is finished !");
+                                Alert gameOverPopup = new Alert(Alert.AlertType.INFORMATION);
+                                gameOverPopup.setTitle("Game Over !");
+                                gameOverPopup.setHeaderText("Game Over !");
+                                gameOverPopup.setContentText("Your score : ");
                             }
                         }
                     }
                 }, 500);
             }
-
-            System.out.println(Arrays.toString(matchCards));
         }
 
         private void findPair() {
