@@ -2,6 +2,7 @@ package graphics;
 
 import core.*;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -23,10 +24,12 @@ import java.util.TimerTask;
 
 public class Main extends Application {
 
-    private Game game = null;
-    private int pairsAmount = 4;
+    private static Game game = null;
+    private static int pairsAmount = 4;
     private int rows = 2;
     private final int cols = 4;
+    private static Label scoreCounter = new Label("0");
+    private static Label gameStatus = new Label("No game");
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -36,10 +39,10 @@ public class Main extends Application {
         Button buttonStopGame = new Button("Leave game");
 
         Label scoreTitle = new Label("Score");
-        Label scoreCounter = new Label("0");
+
+        scoreCounter.setStyle("-fx-font-size:40;");
 
         Label statusTitle = new Label("Game status");
-        Label gameStatus = new Label("No game");
 
         BorderPane root = new BorderPane();
         GridPane branch = new GridPane();
@@ -100,6 +103,7 @@ public class Main extends Application {
                     game = null;
                     branch.getChildren().clear();
                     gameStatus.setText("No game");
+                    scoreCounter.setText("0");
                 } else {
                     primaryStage.close();
                     System.exit(0);
@@ -203,6 +207,15 @@ public class Main extends Application {
         return true;
     }
 
+    public static void updateScore(int amount) {
+        System.out.println("SCORE UPDATED WITH " + amount);
+        game.appendScore(amount);
+        scoreCounter.setText(String.valueOf(game.getScore()));
+        if(game.getScore() == pairsAmount * 4) {
+            scoreCounter.setText(scoreCounter.getText() + ", PERFECT GUESS !");
+        }
+    }
+
     public static class CardFilter implements EventHandler<MouseEvent> {
         Rectangle rec;
         Card card;
@@ -225,34 +238,42 @@ public class Main extends Application {
                 timer.schedule(new TimerTask() {
                     @Override
                     public void run() {
-                        if (matchCards[0] == null) {
-                            matchCards[0] = card;
-                            matchRecs[0] = rec;
-                        } else if (matchCards[1] == null && !(matchCards[0].equals(card))) {
-                            matchCards[1] = card;
-                            matchRecs[1] = rec;
-                            if (isMatching()) {
-                                findPair();
-                            } else {
-                                fillBlack();
+                        Platform.runLater(() -> {
+                            if (matchCards[0] == null) {
+                                matchCards[0] = card;
+                                matchRecs[0] = rec;
+                            } else if (matchCards[1] == null && !(matchCards[0].equals(card))) {
+                                matchCards[1] = card;
+                                matchRecs[1] = rec;
+                                if (isMatching()) {
+                                    findPair();
+                                } else {
+                                    fillBlack();
+                                }
+                                clearMatchCards();
+                                if(isGameOver(game)) {
+                                    gameOver();
+                                }
                             }
-                            clearMatchCards();
-                            if(isGameOver(game)) {
-                                System.out.println("Game is finished !");
-                                Alert gameOverPopup = new Alert(Alert.AlertType.INFORMATION);
-                                gameOverPopup.setTitle("Game Over !");
-                                gameOverPopup.setHeaderText("Game Over !");
-                                gameOverPopup.setContentText("Your score : ");
-                            }
-                        }
+                        });
                     }
                 }, 500);
             }
         }
 
+        private void gameOver() {
+            gameStatus.setText("Finished!");
+            Alert gameOverPopup = new Alert(Alert.AlertType.INFORMATION);
+            gameOverPopup.setTitle("Game Over !");
+            gameOverPopup.setHeaderText("Game Over !");
+            gameOverPopup.setContentText("Your score : " + game.getScore());
+            gameOverPopup.showAndWait();
+        }
+
         private void findPair() {
             matchCards[0].find();
             matchCards[1].find();
+            updateScore(4);
         }
 
         public boolean isMatching() {
@@ -267,6 +288,7 @@ public class Main extends Application {
         private void fillBlack() {
             matchRecs[0].setFill(Color.BLACK);
             matchRecs[1].setFill(Color.BLACK);
+            updateScore(-2);
         }
     }
 

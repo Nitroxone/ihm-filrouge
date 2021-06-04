@@ -35,7 +35,7 @@ public class Game {
         Collections.shuffle(this.pairs);
     }
 
-    public void resetScore() {
-        score = 0;
+    public void appendScore(int value) {
+        this.score = Math.max(0,this.score+=value);
     }
 }
