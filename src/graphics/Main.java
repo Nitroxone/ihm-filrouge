@@ -56,6 +56,7 @@ public class Main extends Application {
             @Override
             public void handle(MouseEvent event) {
 
+                // CREATING A POPUP FOR THE GAME SETTINGS
                 boolean generate = false;
                 Alert newGameSetup = new Alert(Alert.AlertType.CONFIRMATION);
                 newGameSetup.setTitle("Select pairs amount");
